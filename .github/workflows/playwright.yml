@@ -13,10 +13,8 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
-    - name: Move to test project
-      run: cd Prompting-Lab/E2ETests/ && BASEDIR =${PWD}
-    - name: Install dependencies
-      run: npm ci
+    - name: Install dependencies for test project
+      run: cd Prompting-Lab/E2ETests/ npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
     - name: Run Playwright tests
