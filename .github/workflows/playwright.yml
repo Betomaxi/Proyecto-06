@@ -13,6 +13,8 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+    - name: Move to test project
+      run: cd Prompting-Lab/E2ETests/
     - name: Install dependencies
       run: npm ci
     - name: Install Playwright Browsers
