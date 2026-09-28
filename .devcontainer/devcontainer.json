@@ -1,4 +1,9 @@
 {
   "image": "mcr.microsoft.com/devcontainers/universal:2",
-  "features": {}
+  "features": {
+    "ghcr.io/stu-bell/devcontainer-features/node:0": {},
+    "ghcr.io/stu-bell/devcontainer-features/python:3.12": {},
+    "ghcr.io/schlich/devcontainer-features/playwright:0": {},
+    "ghcr.io/postfinance/devcontainer-features/playwright-deps:2": {}
+  }
 }
