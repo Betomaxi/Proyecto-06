@@ -56,6 +56,6 @@ The walkthrough configures but does not submit an experiment, browses an existin
 - `docs/project-definition.md`: original assignment and the current closeout checklist.
 - `docs/api_contract.md`: frontend-facing API contract.
 
-## Research Closeout Gate
+## Research Closeout & Demonstration Video 
 
-Do not report the currently stored metrics as a finding. First investigate why the saved model responses do not contain valid intent labels, reconcile the two stale `running` entries, verify the ground-truth annotations, and produce a supported comparison and explicit conclusion. A corrected evaluation is intentionally not launched by this closeout documentation update.
+https://drive.google.com/drive/folders/1IGRGWEa0_7_UchxP2_gQlrsj2JqU6yYY?usp=sharing
