@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react'
 import { config } from '../config.js'
 import './App.css'
@@ -232,6 +233,19 @@ function App() {
     return Number.isNaN(date.getTime()) ? value : date.toLocaleString()
   }
 
+  function formatDuration(totalSeconds) {
+    if (isNaN(totalSeconds) || totalSeconds < 0) {
+        return "N/A";
+    }
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+
+    const pad = (num) => String(num).padStart(2, '0');
+
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+}
+
   return (
     <main className="app-shell">
       <header className="topbar">
@@ -318,34 +332,36 @@ function App() {
                 {experiments.map((experiment) => {
                   const isExpanded = expandedExperiment === experiment.experiment_id
                   return (
-                    <article className="experiment-item" key={experiment.experiment_id}>
-                      <div className="experiment-row">
-                        <div className="experiment-main">
-                          <span className={`status-pill status-${experiment.status || 'unknown'}`}><span className="status-dot" />{experiment.status || 'unknown'}</span>
-                          <div className="experiment-copy"><h2>{experiment.experiment_id}</h2><p>{formatDate(experiment.created_at)} <span className="meta-separator">/</span> {experiment.model_name || 'Default model'}</p></div>
-                        </div>
-                        <div className="experiment-meta"><span>{experiment.runs_per_technique || 0} runs</span><span>{(experiment.techniques || []).length} techniques</span>
-                          <button className="secondary-button compact" type="button" onClick={() => {
-                            setExperimentFiles([])
-                            setFilesError('')
-                            setExpandedExperiment(isExpanded ? null : experiment.experiment_id)
-                          }}>{isExpanded ? 'Hide files' : 'Files'}</button>
-                          <button className="danger-button compact" type="button" disabled={['pending', 'running'].includes(experiment.status)} title={['pending', 'running'].includes(experiment.status) ? 'Wait for this experiment to finish before deleting it.' : undefined} onClick={() => setDeleteTarget(experiment)}>Delete</button>
-                        </div>
+
+                  <div className="experiment-row">
+                    <div className="experiment-main">
+                      <span className={`status-pill status-${experiment.status || 'unknown'}`}><span className="status-dot" />{experiment.status || 'unknown'}</span>
+                      <div className="experiment-copy">
+                        <h2>{experiment.experiment_id}</h2>
+                        <p>{formatDate(experiment.created_at)} <span className="meta-separator">/</span> {experiment.model_name || 'Default model'}</p>
                       </div>
-                      {isExpanded && <div className="file-panel">
-                        <div className="file-panel-heading"><h3>Generated files</h3><span>{experimentFiles.length} files</span></div>
-                        {filesError && <p className="error-message" role="alert">{filesError}</p>}
-                        {experimentFiles.length === 0 && !filesError ? <p className="file-empty">No output files available yet.</p> : (
-                          <ul className="file-list">{experimentFiles.map((file) => {
-                            const fileKey = `${experiment.experiment_id}/${file.filename}`
-                            return <li key={file.filename}><span className="file-name"><span className="file-mark">FILE</span>{file.filename}</span><span className="file-size">{(file.size / 1024).toFixed(file.size < 1024 ? 0 : 1)} KB</span>
-                              <button className="text-button download-button" type="button" disabled={selectedFile === fileKey} onClick={() => downloadExperimentFile(experiment.experiment_id, file.filename)}>{selectedFile === fileKey ? 'Downloading…' : 'Download'}</button>
-                            </li>
-                          })}</ul>
-                        )}
-                      </div>}
-                    </article>
+                      {/* *** INSERT THE NEW TIMING DISPLAY HERE *** */}
+                      <div className="experiment-copy">
+                          {experiment.status === 'done' && experiment.end_time && (
+                              <>
+                                  <p>
+                                      <strong className="duration">Duration:</strong> {formatDuration(
+                                          (new Date(experiment.end_time.replace('Z', '+00:00')).getTime() - new Date(experiment.created_at.replace('Z', '+00:00')).getTime()) / 1000
+                                      )}
+                                  </p>
+                              </>
+                          )}
+                      </div>
+                    </div>
+                    <div className="experiment-meta"><span>{experiment.runs_per_technique || 0} runs</span><span>{(experiment.techniques || []).length} techniques</span>
+                      <button className="secondary-button compact" type="button" onClick={() => {
+                          setExperimentFiles([])
+                          setFilesError('')
+                          setExpandedExperiment(isExpanded ? null : experiment.experiment_id)
+                      }}>{isExpanded ? 'Hide files' : 'Files'}</button>
+                      <button className="danger-button compact" type="button" disabled={['pending', 'running'].includes(experiment.status)} title={['pending', 'running'].includes(experiment.status) ? 'Wait for this experiment to finish before deleting it.' : undefined} onClick={() => setDeleteTarget(experiment)}>Delete</button>
+                    </div>
+                  </div>
                   )
                 })}
               </div>

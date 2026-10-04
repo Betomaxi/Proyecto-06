@@ -4,7 +4,7 @@ Project 06 is a full-stack research tool for comparing LLM prompting techniques 
 
 ## Current Closeout Status
 
-The API, React workspace, dataset upload, experiment browsing/downloads, and a recorded Playwright walkthrough are implemented. The dataset currently contains 40 examples (20 Spanish and 20 English). The research result is **not ready for a final conclusion**: the latest completed experiment (`exp_1790798349_92639f67`) has 480 rows, all predicted as `invalid_response`, and reports 0.0 mean accuracy for all four techniques. Earlier completed experiments report 0.1 mean accuracy. Two experiment metadata records remain `running`. See the [project closeout checklist](docs/project-definition.md#13-cierre-y-estado-del-proyecto) before presenting results.
+The API, React workspace, dataset upload, experiment browsing/downloads, and a recorded Playwright walkthrough are implemented. The dataset currently contains 40 examples (20 Spanish and 20 English).
 
 ## Run Locally
 

@@ -133,8 +133,8 @@ class ExperimentMetadata(BaseModel):
     params: Dict[str, Any]
     status: str  # pending, running, done, failed
     summary: Optional[Dict[str, Any]] = None
-
-
+    end_time: Optional[str] = None  # Added to store the experiment end time
+    
 # -------------------------
 # Utilities: dataset I/O, prompts, LLM wrapper, parsing, metrics
 # -------------------------
@@ -372,6 +372,7 @@ def call_llm(prompt: str, model_name: Optional[str], params: Dict[str, Any]) -> 
 # -------------------------
 # Experiment execution logic
 # -------------------------
+
 def run_experiment_sync(
     dataset_path: str,
     techniques: List[str],
@@ -384,6 +385,10 @@ def run_experiment_sync(
     Ejecuta el experimento de forma síncrona y guarda resultados en experiment_dir.
     Retorna un resumen con métricas agregadas.
     """
+    # Record start time
+    start_time = datetime.utcnow().isoformat() + "Z"
+    logger.info(f"Experiment {experiment_dir} started at: {start_time}")
+
     # Cargar dataset
     dataset = load_jsonl(dataset_path)
     # Validar estructura mínima
@@ -421,6 +426,7 @@ def run_experiment_sync(
                 }
                 results_raw.append(record)
                 run_records.append(record)
+
             # Calcular métricas para esta técnica+run
             df_run = pd.DataFrame(run_records)
             metrics = compute_metrics(df_run)
@@ -562,10 +568,11 @@ def start_experiment(
     # Ejecutar en background
     def _bg_task():
         try:
-            # actualizar status
+            # 1. Set status to running
             metadata.status = "running"
             save_json_atomically(metadata.model_dump(), meta_path)
 
+            # 2. Execute the experiment
             result = run_experiment_sync(
                 dataset_path=dataset_path,
                 techniques=techniques,
@@ -575,18 +582,21 @@ def start_experiment(
                 experiment_dir=experiment_dir,
             )
 
-            # actualizar metadata con resumen
+            # 3. Update metadata with summary and END TIME
             metadata.status = "done"
             metadata.summary = {
                 "result_files": result,
                 "aggregated": result.get("aggregated"),
             }
+            # *** NEW: Record the end time ***
+            metadata.end_time = datetime.utcnow().isoformat() + "Z"
             save_json_atomically(metadata.model_dump(), meta_path)
         except Exception as e:
             metadata.status = "failed"
             metadata.summary = {"error": str(e)}
+            # *** NEW: Record the end time even on failure ***
+            metadata.end_time = datetime.utcnow().isoformat() + "Z"
             save_json_atomically(metadata.model_dump(), meta_path)
-
     background_tasks.add_task(_bg_task)
 
     return {"experiment_id": experiment_id, "experiment_dir": experiment_dir, "status": "started"}
