@@ -763,6 +763,76 @@ if not os.path.exists(SAMPLE_DATASET_PATH):
     save_jsonl(sample, SAMPLE_DATASET_PATH)
 
 # -------------------------
+# Helper: crear dataset difícil de ejemplo si no existe (10 ejemplos)
+# -------------------------
+DIFFICULT_DATASET_PATH = os.path.join(DATASETS_DIR, "dataset_difficult.jsonl")
+if not os.path.exists(DIFFICULT_DATASET_PATH):
+    difficult = [
+        {"id":"D001","language":"es","text":"Quiero cancelar mi suscripción, pero también necesito un reembolso del último cobro.","ground_truth":{"intent":"cancel_subscription"},"annotator":"Roberto","notes":"Ambiguo: menciona cancelación y reembolso; se priorizó cancel_subscription según regla de prioridad."},
+        {"id":"D002","language":"es","text":"La aplicación funciona, pero los reportes muestran cifras incorrectas.","ground_truth":{"intent":"technical_support"},"annotator":"Roberto","notes":"Ambiguo: podría ser bug técnico o problema de facturación; se etiquetó como technical_support."},
+        {"id":"D003","language":"es","text":"¿Pueden ofrecerme un descuento si actualizo al plan premium?","ground_truth":{"intent":"upgrade_plan"},"annotator":"Roberto","notes":"Ambiguo: pregunta por descuento (general_inquiry) y upgrade; se priorizó upgrade_plan."},
+        {"id":"D004","language":"es","text":"No recibí la factura este mes y además no puedo entrar a mi cuenta.","ground_truth":{"intent":"billing_issue"},"annotator":"Roberto","notes":"Ambiguo: menciona facturación y acceso; se priorizó billing_issue."},
+        {"id":"D005","language":"es","text":"Me gustaría una demo de las nuevas funciones antes de decidir si cambio de plan.","ground_truth":{"intent":"feature_request"},"annotator":"Roberto","notes":"Ambiguo: podría ser general_inquiry o upgrade_plan; se etiquetó como feature_request por énfasis en nuevas funciones."},
+        {"id":"D001_EN","language":"en","text":"I want to cancel my subscription, but I also need a refund for the last charge.","ground_truth":{"intent":"cancel_subscription"},"annotator":"Roberto","notes":"Ambiguous: mentions cancellation and refund; prioritized cancel_subscription according to rule."},
+        {"id":"D002_EN","language":"en","text":"The application works, but the reports show incorrect figures.","ground_truth":{"intent":"technical_support"},"annotator":"Roberto","notes":"Ambiguous: could be a technical bug or billing issue; labeled technical_support."},
+        {"id":"D003_EN","language":"en","text":"Can you offer me a discount if I upgrade to the premium plan?","ground_truth":{"intent":"upgrade_plan"},"annotator":"Roberto","notes":"Ambiguous: asks about discount (general_inquiry) and upgrade; prioritized upgrade_plan."},
+        {"id":"D004_EN","language":"en","text":"I didn’t receive the invoice this month and I also can’t log into my account.","ground_truth":{"intent":"billing_issue"},"annotator":"Roberto","notes":"Ambiguous: mentions billing and access; prioritized billing_issue."},
+        {"id":"D005_EN","language":"en","text":"I would like a demo of the new features before deciding whether to change plans.","ground_truth":{"intent":"feature_request"},"annotator":"Roberto","notes":"Ambiguous: could be general_inquiry or upgrade_plan; labeled feature_request due to emphasis on new features."}
+    ]
+    save_jsonl(difficult, DIFFICULT_DATASET_PATH)
+
+# -------------------------
+# Helper: crear dataset difícil (texto largo y léxico complejo)
+# -------------------------
+HARD_DATASET_PATH = os.path.join(DATASETS_DIR, "dataset_hard.jsonl")
+if not os.path.exists(HARD_DATASET_PATH):
+    hard = [
+        {
+            "id":"DH001","language":"es",
+            "text":"He decidido que no quiero seguir con el servicio, cancelen mi suscripción; además, el último cargo aparece duplicado en mi tarjeta y necesito que lo revisen y me reembolsen si procede. No quiero que me llamen, prefiero respuesta por escrito.",
+            "ground_truth":{"intent":"cancel_subscription"},
+            "annotator":"Roberto",
+            "notes":"Texto largo que menciona cancelación y posible reembolso; prioridad: cancel_subscription. Preferencia de canal explícita (solo por escrito)."
+        },
+        {
+            "id":"DH002","language":"es",
+            "text":"Desde la última actualización la plataforma muestra datos inconsistentes en los reportes financieros —por ejemplo, el total de ingresos no coincide con las facturas—; sospecho un problema de conciliación entre módulos, ¿es esto un fallo conocido o debo abrir un ticket de soporte técnico formal?",
+            "ground_truth":{"intent":"technical_support"},
+            "annotator":"Roberto",
+            "notes":"Lenguaje técnico y referencia a conciliación; ambigüedad entre bug conocido y consulta general; etiquetado como technical_support."
+        },
+        {
+            "id":"DH003","language":"es",
+            "text":"Estoy evaluando migrar al plan Premium, pero solo si la integración con nuestro ERP permite exportación automática, SSO y preserva el histórico de transacciones; además, ¿ofrecen descuentos por contrato anual y cuál sería el proceso para migrar sin downtime?",
+            "ground_truth":{"intent":"upgrade_plan"},
+            "annotator":"Roberto",
+            "notes":"Múltiples sub‑preguntas (integración técnica, descuento comercial, proceso de migración); intención principal: upgrade_plan."
+        },
+        {
+            "id":"DH001_EN","language":"en",
+            "text":"I have decided I no longer want the service—please cancel my subscription; additionally, the last charge appears duplicated on my card and I need you to review it and refund me if appropriate. Do not call me; I prefer a written response.",
+            "ground_truth":{"intent":"cancel_subscription"},
+            "annotator":"Roberto",
+            "notes":"Long text mentioning cancellation and refund; priority: cancel_subscription. Explicit channel preference (written only)."
+        },
+        {
+            "id":"DH002_EN","language":"en",
+            "text":"Since the last update the platform shows inconsistent figures in financial reports—for instance, total revenue does not match invoices; I suspect a reconciliation issue between modules. Is this a known bug or should I file a formal technical support ticket?",
+            "ground_truth":{"intent":"technical_support"},
+            "annotator":"Roberto",
+            "notes":"Technical wording and reconciliation reference; ambiguous between known issue and general inquiry; labeled technical_support."
+        },
+        {
+            "id":"DH003_EN","language":"en",
+            "text":"I'm considering upgrading to the Premium plan, but only if the integration with our ERP supports automatic exports, SSO, and preserves historical transactions; also, do you offer annual contract discounts and what is the migration process to avoid downtime?",
+            "ground_truth":{"intent":"upgrade_plan"},
+            "annotator":"Roberto",
+            "notes":"Multiple sub-questions (technical integration, commercial discount, migration process); primary intent: upgrade_plan."
+        }
+    ]
+    save_jsonl(hard, HARD_DATASET_PATH)
+
+# -------------------------
 # Run the application using uvicorn when executed directly
 # -------------------------
 if __name__ == "__main__":
