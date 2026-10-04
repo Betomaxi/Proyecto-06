@@ -50,3 +50,7 @@ data/raw/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+#exclude experimental files
+experiments/
+datasets/

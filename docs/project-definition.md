@@ -114,3 +114,36 @@ Las 4 técnicas fueron evaluadas con al menos 3 corridas cada una sobre el datas
 Existe una conclusión final explícita, respaldada por los números obtenidos.
 
 BSG · Fundamentos de Arquitectura LLM · Proyecto Final
+
+13. Cierre y estado del proyecto (actualizado: 2026-09-30)
+
+Estado general: la aplicación y el flujo de interfaz están implementados y verificados. El cierre académico sigue pendiente porque los resultados guardados no contienen predicciones válidas para respaldar una conclusión.
+
+### Verificado
+
+- [x] `Prompting-Lab/Backend/datasets/dataset.jsonl` existe y contiene 40 ejemplos: 20 en español y 20 en inglés. El conteo no sustituye la revisión humana de las etiquetas.
+- [x] El backend expone los endpoints de salud, datasets y experimentos. La lista de experimentos tolera metadata legacy vacía y los archivos se descargan como Base64.
+- [x] La interfaz permite configurar experimentos, revisar estados, descargar archivos, confirmar eliminación y subir datasets.
+- [x] La prueba Playwright recorre la interfaz, descarga metadata, cancela la eliminación y sube/limpia un dataset temporal. Pasó en Chromium sin enviar `POST /experiments/run`.
+- [x] El video de demostración técnica está en `Prompting-Lab/E2ETests/test-results/`.
+- [x] La configuración local y los pasos de ejecución están en `README.md`; el contrato de endpoints está en `docs/api_contract.md`.
+- [x] El servicio respondió a la interfaz y a la prueba E2E en el entorno local. Las variables de proveedor/modelo para otro entorno deben confirmarse al desplegar.
+
+### Pendiente antes de declarar terminado
+
+- [ ] Revisar manualmente que el ground truth de cada ejemplo sea correcto e inequívoco y que no haya sido generado por el modelo evaluado.
+- [ ] Corregir y validar la ruta de inferencia/parseo de respuestas. El experimento completado más reciente (`exp_1790798349_92639f67`) registró 480 de 480 predicciones como `invalid_response`, con accuracy media 0.0 en las cuatro técnicas. Experimentos completados anteriores muestran accuracy media 0.1. No presentar estos archivos como evidencia de que una técnica ganó.
+- [ ] Revisar los experimentos `exp_1790797782_fcd0b2de` y `exp_1790797431_bc72a708`, que todavía aparecen con estado `running`, y determinar si deben completarse o marcarse como fallidos.
+- [ ] Confirmar la configuración real del proveedor/modelo y los parámetros utilizados; no validar ni divulgar secretos del archivo `.env`.
+- [ ] Después de corregir la inferencia, ejecutar la evaluación completa sobre los 40 ejemplos, las cuatro técnicas y al menos tres corridas por técnica. Una ejecución completa debe generar 480 registros crudos y métricas coherentes.
+- [ ] Analizar accuracy y variabilidad por técnica y escribir una conclusión explícita respaldada por los resultados válidos, incluyendo si contradicen la expectativa inicial.
+- [ ] Grabar el video académico de máximo 30 minutos solicitado en la rúbrica: metodología, construcción del ground truth, comparación final y aprendizaje. El video Playwright es evidencia técnica del UI y no reemplaza este entregable.
+
+### Mejoras de mantenimiento no bloqueantes
+
+- [ ] Agregar pruebas unitarias para `normalize_label`, `compute_metrics` y el modo mock de `call_llm`.
+- [ ] Agregar un smoke test de backend en modo mock que valide los archivos y métricas sin depender de Ollama.
+- [ ] Ampliar la observabilidad con eventos de ciclo de vida y duración por llamada; actualmente no se genera `run.log` por experimento.
+- [ ] Como mejora futura de UI, mostrar ejemplos y notas del dataset y permitir filtrar ejemplos por `notes.tags`.
+
+No se inició una nueva evaluación como parte de esta actualización de cierre.

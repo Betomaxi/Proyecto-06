@@ -1,95 +1,61 @@
-# Prompting-Lab Project Overview
+# Prompting Lab
 
-This repository contains a full-stack application project, structured into a Frontend (React/Vite) and a Backend (FastAPI).
+Project 06 is a full-stack research tool for comparing LLM prompting techniques on a manually labeled support-intent dataset. It records raw predictions and computes accuracy per run and aggregate accuracy/standard deviation per technique.
 
-## Project Context and Motivation
-This project is dedicated to empirically testing prompting techniques (few-shot, chain-of-thought, zero-shot-CoT, role prompting) on a custom dataset to measure their quantitative performance. The core motivation is to move beyond subjective evaluation and measure the objective accuracy and variability of these techniques when applied to a specific task.
+## Current Closeout Status
 
-**Key Goal:** To design a controlled experiment where the prompting technique is the only variable, and the performance is measured against known ground truth.
+The API, React workspace, dataset upload, experiment browsing/downloads, and a recorded Playwright walkthrough are implemented. The dataset currently contains 40 examples (20 Spanish and 20 English). The research result is **not ready for a final conclusion**: the latest completed experiment (`exp_1790798349_92639f67`) has 480 rows, all predicted as `invalid_response`, and reports 0.0 mean accuracy for all four techniques. Earlier completed experiments report 0.1 mean accuracy. Two experiment metadata records remain `running`. See the [project closeout checklist](docs/project-definition.md#13-cierre-y-estado-del-proyecto) before presenting results.
 
-## Core Methodology (Based on Project Definition)
-1. **Dataset:** A custom dataset of at least 20 examples with manually verified, known correct answers (ground truth).
-2. **Experimentation:** Applying at least 4 prompting techniques (Zero-shot, Few-shot, Chain-of-Thought, Role Prompting) to the same task and dataset.
-3. **Variability Measurement:** Running a minimum of 3 trials for each technique to capture statistical variability, not just a single accuracy score.
-4. **Reproducibility:** Ensuring the process is reproducible by keeping generation parameters (temperature, max_tokens) constant across all techniques.
+## Run Locally
 
-## Project Structure
-The project is organized under the `Prompting-Lab` directory:
-*   **Frontend:** Located in `Prompting-Lab/Frontend/`, containing the React application code.
-*   **Backend:** Located in `Prompting-Lab/Backend/`, containing the Python FastAPI application.
-*   **E2E Tests:** Located in `Prompting-Lab/E2ETests/`, containing Playwright tests.
+Prerequisites: Python 3.10+, Node.js/npm, and (for model-backed evaluation) a reachable Ollama service or a supported OpenAI configuration.
 
-## Component Details
+### Backend
 
-### Backend Details
-The backend is a simple API service built with FastAPI:
-*   **File:** `Prompting-Lab/Backend/main.py`
-
-### Frontend Details
-The frontend is a modern React application built with Vite:
-*   **Dependencies:** Uses React and Vite for setup.
-*   **Entry Point:** `Prompting-Lab/Frontend/src/main.jsx`
-*   **Main Component:** `Prompting-Lab/Frontend/src/App.jsx`
-*   **Assets:** Includes assets like `hero.png`, `react.svg`, and `vite.svg`.
-
-## Testing
-End-to-End tests are configured in:
-*   `Prompting-Lab/E2ETests/playwright.config.ts`
-
-## Project Exploration Summary
-This repository is a full-stack project featuring a React/Vite Frontend, a FastAPI Backend, and Playwright E2E Tests. The structure is organized as follows:
-*   **Frontend:** `Prompting-Lab/Frontend/` (React/Vite)
-*   **Backend:** `Prompting-Lab/Backend/` (FastAPI)
-*   **E2E Tests:** `Prompting-Lab/E2ETests/` (Playwright)
-
-**Key Files to Note:**
-*   `Frontend/src/App.jsx`: The main React component, which reads configuration from `config.js` to determine the backend port.
-*   `Backend/main.py`: The FastAPI server running on port 8111.
-*   `E2ETests/tests/example.spec.ts`: Playwright tests verifying the integration between the frontend and backend.
-
-**Setup Notes:**
-
-### Prerequisites
-Ensure you have Node.js/npm (for Frontend), Python (for Backend), and Playwright installed on your system.
-
-### 1. Backend Setup (FastAPI)
-Navigate to the backend directory and set up the Python environment:
-
-```bash
+```powershell
 cd Prompting-Lab/Backend
-# Create and activate a virtual environment
-python3 -m venv venv
-source venv/bin/activate  # Use '.\venv\Scripts\Activate.ps1' for Windows PowerShell
-
-# Install dependencies
+python -m venv venv
+.\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+Copy-Item .env.example .env
+# Edit .env only when configuring a real model/provider.
+uvicorn main:app --reload --host 127.0.0.1 --port 8111 --env-file .env
 ```
 
-### 2. Frontend Setup (React/Vite)
-Navigate to the frontend directory and install dependencies:
+On macOS/Linux, activate with `source venv/bin/activate`. The default mock configuration needs no provider key. Verify the service at `http://127.0.0.1:8111/health`.
 
-```bash
+### Frontend
+
+```powershell
 cd Prompting-Lab/Frontend
 npm install
-```
-
-### 3. Run Frontend (Development Server)
-Start the Vite development server to run the React application:
-
-```bash
 npm run dev
 ```
 
-### 4. Run Backend (API Server) inside venv
-Run the FastAPI application. You may need to set environment variables (e.g., in .env file):
-```bash
-uvicorn main:app --reload --port 8111
-```
+Open `http://127.0.0.1:5173/`. The frontend reads the API port from `Prompting-Lab/Frontend/config.js` (default `8111`).
 
-### 5. Run E2E Tests (Playwright)
-Execute the end-to-end tests:
+### End-to-End Walkthrough
 
-```bash
+Start the backend first. Then:
+
+```powershell
 cd Prompting-Lab/E2ETests
-# Run the tests
+npm install
+npx playwright install chromium
+npm run test:e2e
 ```
+
+The walkthrough configures but does not submit an experiment, browses an existing completed experiment and downloads metadata, opens and cancels the delete confirmation, and uploads a temporary JSONL dataset which it removes afterward. It expects at least one completed experiment to already exist. Videos are written under `Prompting-Lab/E2ETests/test-results/`.
+
+## Project Areas
+
+- `Prompting-Lab/Backend/main.py`: FastAPI endpoints, model adapters, experiment execution, and metrics.
+- `Prompting-Lab/Backend/datasets/dataset.jsonl`: 40-row bilingual sample dataset.
+- `Prompting-Lab/Frontend/`: React/Vite run form, experiment history, file downloads, and dataset upload.
+- `Prompting-Lab/E2ETests/`: Chromium UI walkthrough and video recording configuration.
+- `docs/project-definition.md`: original assignment and the current closeout checklist.
+- `docs/api_contract.md`: frontend-facing API contract.
+
+## Research Closeout Gate
+
+Do not report the currently stored metrics as a finding. First investigate why the saved model responses do not contain valid intent labels, reconcile the two stale `running` entries, verify the ground-truth annotations, and produce a supported comparison and explicit conclusion. A corrected evaluation is intentionally not launched by this closeout documentation update.
